@@ -82,7 +82,7 @@ export const addLike = async (req: Request, res: Response) => {
   }
 };
 
-export const removeLike = async (req: Request, res: Response) => {
+export const deleteLike = async (req: Request, res: Response) => {
   try {
     const card = await Card.findByIdAndUpdate(
       req.params.cardId,

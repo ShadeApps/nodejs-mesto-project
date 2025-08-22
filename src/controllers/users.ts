@@ -45,20 +45,6 @@ export const getUserById = async (req: Request, res: Response) => {
   }
 };
 
-export const getCurrentUser = async (req: Request, res: Response) => {
-  try {
-    const user = await User.findById(req.user._id);
-    if (!user) {
-      return res.status(404).json({
-        message: 'Пользователь не найден.',
-      });
-    }
-    return res.status(200).json(user);
-  } catch (error: any) {
-    return res.status(500).json({ message: 'На сервере произошла ошибка' });
-  }
-};
-
 export const updateUserProfile = async (req: Request, res: Response) => {
   try {
     const updUser = await User.findByIdAndUpdate(
