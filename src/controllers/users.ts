@@ -13,7 +13,7 @@ export const createUser = async (req: Request, res: Response) => {
         message: 'Переданы некорректные данные при создании пользователя.',
       });
     }
-    return res.status(500).json(error);
+    return res.status(500).json({ message: 'На сервере произошла ошибка' });
   }
 };
 
@@ -22,7 +22,7 @@ export const getAllUsers = async (req: Request, res: Response) => {
     const users = await User.find();
     return res.status(200).json(users);
   } catch (error: any) {
-    return res.status(500).json(error);
+    return res.status(500).json({ message: 'На сервере произошла ошибка' });
   }
 };
 
@@ -41,7 +41,7 @@ export const getUserById = async (req: Request, res: Response) => {
         message: 'Передан некорректный _id пользователя.',
       });
     }
-    return res.status(500).json(error);
+    return res.status(500).json({ message: 'На сервере произошла ошибка' });
   }
 };
 
@@ -55,7 +55,7 @@ export const getCurrentUser = async (req: Request, res: Response) => {
     }
     return res.status(200).json(user);
   } catch (error: any) {
-    return res.status(500).json(error);
+    return res.status(500).json({ message: 'На сервере произошла ошибка' });
   }
 };
 
@@ -78,7 +78,7 @@ export const updateUserProfile = async (req: Request, res: Response) => {
         message: 'Переданы некорректные данные при обновлении профиля.',
       });
     }
-    return res.status(500).json(error);
+    return res.status(500).json({ message: 'На сервере произошла ошибка' });
   }
 };
 
@@ -101,6 +101,6 @@ export const updateUserAvatar = async (req: Request, res: Response) => {
         message: 'Переданы некорректные данные при обновлении аватара.',
       });
     }
-    return res.status(500).json(error);
+    return res.status(500).json({ message: 'На сервере произошла ошибка' });
   }
 };

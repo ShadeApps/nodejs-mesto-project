@@ -17,7 +17,7 @@ export const createCard = async (req: Request, res: Response) => {
         message: 'Переданы некорректные данные при создании карточки.',
       });
     }
-    return res.status(500).json(error);
+    return res.status(500).json({ message: 'На сервере произошла ошибка' });
   }
 };
 
@@ -26,7 +26,7 @@ export const getAllCards = async (req: Request, res: Response) => {
     const cards = await Card.find();
     return res.status(200).json(cards);
   } catch (error: any) {
-    return res.status(500).json(error);
+    return res.status(500).json({ message: 'На сервере произошла ошибка' });
   }
 };
 
@@ -50,7 +50,7 @@ export const deleteCard = async (req: Request, res: Response) => {
         message: 'Карточка с указанным _id не найдена.',
       });
     }
-    return res.status(500).json(error);
+    return res.status(500).json({ message: 'На сервере произошла ошибка' });
   }
 };
 
@@ -78,7 +78,7 @@ export const addLike = async (req: Request, res: Response) => {
         message: 'Переданы некорректные данные для постановки/снятия лайка или некорректный _id карточки.',
       });
     }
-    return res.status(500).json(error);
+    return res.status(500).json({ message: 'На сервере произошла ошибка' });
   }
 };
 
@@ -106,6 +106,6 @@ export const removeLike = async (req: Request, res: Response) => {
         message: 'Переданы некорректные данные для постановки/снятия лайка или некорректный _id карточки.',
       });
     }
-    return res.status(500).json(error);
+    return res.status(500).json({ message: 'На сервере произошла ошибка' });
   }
 };
