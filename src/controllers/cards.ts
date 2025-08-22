@@ -46,7 +46,7 @@ export const deleteCard = async (req: Request, res: Response) => {
       });
     }
     if (error.name === 'CastError') {
-      return res.status(404).json({
+      return res.status(400).json({
         message: 'Карточка с указанным _id не найдена.',
       });
     }
