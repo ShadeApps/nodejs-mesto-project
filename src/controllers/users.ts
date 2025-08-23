@@ -1,6 +1,9 @@
-import { Request, Response } from 'express';
+import { NextFunction, Request, Response } from 'express';
+import bcrypt from 'bcryptjs';
+import jwt from 'jsonwebtoken';
 import User from '../models/user';
-import '../types/express';
+import '../utils/types';
+import JWT_KEY from '../utils/config';
 
 export const createUser = async (req: Request, res: Response) => {
   try {
@@ -88,5 +91,33 @@ export const updateUserAvatar = async (req: Request, res: Response) => {
       });
     }
     return res.status(500).json({ message: 'На сервере произошла ошибка' });
+  }
+};
+
+export const login = async (req: Request, res: Response, next: NextFunction) => {
+  const { email, password } = req.body;
+
+  try {
+    const user = await User.findOne({ email }).select('+password');
+
+      if (!user || (!await bcrypt.compare(password, user.password))) {
+      return res.status(401).json({ message: 'Неправильные почта или пароль' });
+    }
+
+    const token = jwt.sign(
+      { _id: user._id },
+      JWT_KEY,
+      { expiresIn: '7d' },
+    );
+
+    return res
+      .cookie('jwt', token, {
+        httpOnly: true,
+        sameSite: true,
+        maxAge: 7 * 24 * 3600 * 1000,
+      })
+      .send({ message: 'Вход выполнен успешно' });
+  } catch (err) {
+    return next(err);
   }
 };
