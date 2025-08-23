@@ -1,5 +1,6 @@
 import express, { NextFunction, Request, Response } from 'express';
 import mongoose from 'mongoose';
+import cookieParser from 'cookie-parser';
 import userRouter from './routes/users';
 import cardRouter from './routes/cards';
 import './utils/types';
@@ -9,6 +10,8 @@ const { PORT = 3000 } = process.env;
 const app = express();
 
 app.use(express.json());
+
+app.use(cookieParser());
 
 app.post('/signup', createUser);
 app.post('/signin', login);
