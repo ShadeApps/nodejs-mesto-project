@@ -1,8 +1,8 @@
-import { Request, Response } from 'express';
+import { NextFunction, Request, Response } from 'express';
 import Card from '../models/card';
 import { RequestWithUser } from '../utils/types';
 
-export const createCard = async (req: Request, res: Response) => {
+export const createCard = async (req: Request, res: Response, next: NextFunction) => {
   const userId = (req as RequestWithUser).user._id;
   try {
     const {
@@ -22,7 +22,7 @@ export const createCard = async (req: Request, res: Response) => {
   }
 };
 
-export const getAllCards = async (req: Request, res: Response) => {
+export const getAllCards = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const cards = await Card.find();
     return res.status(200).json(cards);
@@ -31,7 +31,7 @@ export const getAllCards = async (req: Request, res: Response) => {
   }
 };
 
-export const deleteCard = async (req: Request, res: Response) => {
+export const deleteCard = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const card = await Card.findByIdAndDelete(req.params.cardId);
     if (!card) {
@@ -55,7 +55,7 @@ export const deleteCard = async (req: Request, res: Response) => {
   }
 };
 
-export const addLike = async (req: Request, res: Response) => {
+export const addLike = async (req: Request, res: Response, next: NextFunction) => {
   const userId = (req as RequestWithUser).user._id;
   try {
     const card = await Card.findByIdAndUpdate(
@@ -84,7 +84,7 @@ export const addLike = async (req: Request, res: Response) => {
   }
 };
 
-export const deleteLike = async (req: Request, res: Response) => {
+export const deleteLike = async (req: Request, res: Response, next: NextFunction) => {
   const userId = (req as RequestWithUser).user._id;
   try {
     const card = await Card.findByIdAndUpdate(

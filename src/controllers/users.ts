@@ -2,25 +2,39 @@ import { NextFunction, Request, Response } from 'express';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import User from '../models/user';
+import AppError from '../errors/appError';
 import { RequestWithUser } from '../utils/types';
 import JWT_KEY from '../utils/config';
 
-export const createUser = async (req: Request, res: Response) => {
+export const createUser = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const { name, about, avatar } = req.body;
-    const user = await User.create({ name, about, avatar });
-    return res.status(201).json(user);
-  } catch (error: any) {
-    if (error.name === 'ValidationError') {
-      return res.status(400).json({
-        message: 'Переданы некорректные данные при создании пользователя.',
-      });
+    const {
+      name, about, avatar, email, password,
+    } = req.body;
+
+    const hashedPassword = await bcrypt.hash(password, 10);
+
+    const user = await User.create({
+      name, about, avatar, email, password: hashedPassword,
+    });
+
+    const { password: _, ...userData } = user.toObject();
+
+    return res.status(201).send(userData);
+  } catch (err: unknown) {
+    if (err instanceof Error && err.name === 'ValidationError') {
+      return next(new AppError('Переданы некорректные данные при создании пользователя', 400));
     }
-    return res.status(500).json({ message: 'На сервере произошла ошибка' });
+
+    if (err instanceof Error && 'code' in err && err.code === 11000) {
+      return next(new AppError('Пользователь с таким email уже существует', 409));
+    }
+
+    return next(err);
   }
 };
 
-export const getAllUsers = async (req: Request, res: Response) => {
+export const getAllUsers = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const users = await User.find();
     return res.status(200).json(users);
@@ -29,7 +43,7 @@ export const getAllUsers = async (req: Request, res: Response) => {
   }
 };
 
-export const getUserById = async (req: Request, res: Response) => {
+export const getUserById = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const user = await User.findById(req.params.userId);
     if (!user) {
@@ -48,7 +62,7 @@ export const getUserById = async (req: Request, res: Response) => {
   }
 };
 
-export const getCurrentUser = async (req: Request, res: Response) => {
+export const getCurrentUser = async (req: Request, res: Response, next: NextFunction) => {
   const userId = (req as RequestWithUser).user._id;
   try {
     const user = await User.findById(userId);
@@ -63,7 +77,7 @@ export const getCurrentUser = async (req: Request, res: Response) => {
   }
 };
 
-export const updateUserProfile = async (req: Request, res: Response) => {
+export const updateUserProfile = async (req: Request, res: Response, next: NextFunction) => {
   const userId = (req as RequestWithUser).user._id;
   try {
     const updUser = await User.findByIdAndUpdate(
@@ -87,7 +101,7 @@ export const updateUserProfile = async (req: Request, res: Response) => {
   }
 };
 
-export const updateUserAvatar = async (req: Request, res: Response) => {
+export const updateUserAvatar = async (req: Request, res: Response, next: NextFunction) => {
   const userId = (req as RequestWithUser).user._id;
   try {
     const updAvatar = await User.findByIdAndUpdate(
