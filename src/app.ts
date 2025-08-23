@@ -3,6 +3,7 @@ import mongoose from 'mongoose';
 import cookieParser from 'cookie-parser';
 import userRouter from './routes/users';
 import cardRouter from './routes/cards';
+import auth from './middlewares/auth';
 import './utils/types';
 import { login, createUser } from './controllers/users';
 
@@ -15,6 +16,8 @@ app.use(cookieParser());
 
 app.post('/signup', createUser);
 app.post('/signin', login);
+
+app.use(auth);
 
 app.use('/', userRouter);
 app.use('/', cardRouter);
