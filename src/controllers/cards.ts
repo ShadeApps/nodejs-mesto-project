@@ -3,7 +3,7 @@ import Card from '../models/card';
 import { RequestWithUser } from '../utils/types';
 
 export const createCard = async (req: Request, res: Response) => {
-  const userId = (req as RequestWithUser).user;
+  const userId = (req as RequestWithUser).user._id;
   try {
     const {
       name, link, owner = userId, likes, createdAt,
@@ -56,7 +56,7 @@ export const deleteCard = async (req: Request, res: Response) => {
 };
 
 export const addLike = async (req: Request, res: Response) => {
-  const userId = (req as RequestWithUser).user;
+  const userId = (req as RequestWithUser).user._id;
   try {
     const card = await Card.findByIdAndUpdate(
       req.params.cardId,
@@ -85,7 +85,7 @@ export const addLike = async (req: Request, res: Response) => {
 };
 
 export const deleteLike = async (req: Request, res: Response) => {
-  const userId = (req as RequestWithUser).user;
+  const userId = (req as RequestWithUser).user._id;
   try {
     const card = await Card.findByIdAndUpdate(
       req.params.cardId,

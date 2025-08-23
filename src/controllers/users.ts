@@ -49,7 +49,7 @@ export const getUserById = async (req: Request, res: Response) => {
 };
 
 export const getCurrentUser = async (req: Request, res: Response) => {
-  const userId = (req as RequestWithUser).user;
+  const userId = (req as RequestWithUser).user._id;
   try {
     const user = await User.findById(userId);
     if (!user) {
@@ -64,7 +64,7 @@ export const getCurrentUser = async (req: Request, res: Response) => {
 };
 
 export const updateUserProfile = async (req: Request, res: Response) => {
-  const userId = (req as RequestWithUser).user;
+  const userId = (req as RequestWithUser).user._id;
   try {
     const updUser = await User.findByIdAndUpdate(
       userId,
@@ -88,7 +88,7 @@ export const updateUserProfile = async (req: Request, res: Response) => {
 };
 
 export const updateUserAvatar = async (req: Request, res: Response) => {
-  const userId = (req as RequestWithUser).user;
+  const userId = (req as RequestWithUser).user._id;
   try {
     const updAvatar = await User.findByIdAndUpdate(
       userId,
