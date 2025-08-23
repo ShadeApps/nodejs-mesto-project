@@ -2,7 +2,7 @@ import { NextFunction, Request, Response } from 'express';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import User from '../models/user';
-import '../utils/types';
+import { RequestWithUser } from '../utils/types';
 import JWT_KEY from '../utils/config';
 
 export const createUser = async (req: Request, res: Response) => {
@@ -100,7 +100,7 @@ export const login = async (req: Request, res: Response, next: NextFunction) => 
   try {
     const user = await User.findOne({ email }).select('+password');
 
-      if (!user || (!await bcrypt.compare(password, user.password))) {
+    if (!user || (!await bcrypt.compare(password, user.password))) {
       return res.status(401).json({ message: 'Неправильные почта или пароль' });
     }
 

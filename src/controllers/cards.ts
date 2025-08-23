@@ -1,8 +1,8 @@
 import { Request, Response } from 'express';
 import Card from '../models/card';
-import '../types/express';
+import { RequestWithUser } from '../utils/types';
 
-export const createCard = async (req: Request, res: Response) => {
+export const createCard = async (req: RequestWithUser, res: Response) => {
   try {
     const {
       name, link, owner = req.user._id, likes, createdAt,
