@@ -7,14 +7,6 @@ import './utils/types';
 const { PORT = 3000 } = process.env;
 const app = express();
 
-// Temporary solution for authorization
-app.use((req: Request, res: Response, next: NextFunction) => {
-  req.user = {
-    _id: '674365e821ad7ba0f382ff1d',
-  };
-  next();
-});
-
 app.use(express.json());
 app.use('/', userRouter);
 app.use('/', cardRouter);
