@@ -3,11 +3,16 @@ import mongoose from 'mongoose';
 import userRouter from './routes/users';
 import cardRouter from './routes/cards';
 import './utils/types';
+import { login, createUser } from './controllers/users';
 
 const { PORT = 3000 } = process.env;
 const app = express();
 
 app.use(express.json());
+
+app.post('/signup', createUser);
+app.post('/signin', login);
+
 app.use('/', userRouter);
 app.use('/', cardRouter);
 app.use('*', (req: Request, res: Response) => {
