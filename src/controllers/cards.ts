@@ -2,10 +2,11 @@ import { Request, Response } from 'express';
 import Card from '../models/card';
 import { RequestWithUser } from '../utils/types';
 
-export const createCard = async (req: RequestWithUser, res: Response) => {
+export const createCard = async (req: Request, res: Response) => {
+  const userId = (req as RequestWithUser).user;
   try {
     const {
-      name, link, owner = req.user._id, likes, createdAt,
+      name, link, owner = userId, likes, createdAt,
     } = req.body;
     const card = await Card.create({
       name, link, owner, likes, createdAt,
@@ -55,10 +56,11 @@ export const deleteCard = async (req: Request, res: Response) => {
 };
 
 export const addLike = async (req: Request, res: Response) => {
+  const userId = (req as RequestWithUser).user;
   try {
     const card = await Card.findByIdAndUpdate(
       req.params.cardId,
-      { $addToSet: { likes: req.user._id } } as any,
+      { $addToSet: { likes: userId } } as any,
       { new: true },
     );
     if (!card) {
@@ -83,10 +85,11 @@ export const addLike = async (req: Request, res: Response) => {
 };
 
 export const deleteLike = async (req: Request, res: Response) => {
+  const userId = (req as RequestWithUser).user;
   try {
     const card = await Card.findByIdAndUpdate(
       req.params.cardId,
-      { $pull: { likes: req.user._id } } as any,
+      { $pull: { likes: userId } } as any,
       { new: true },
     );
     if (!card) {

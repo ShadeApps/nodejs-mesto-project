@@ -64,9 +64,10 @@ export const getCurrentUser = async (req: Request, res: Response) => {
 };
 
 export const updateUserProfile = async (req: Request, res: Response) => {
+  const userId = (req as RequestWithUser).user;
   try {
     const updUser = await User.findByIdAndUpdate(
-      req.user._id,
+      userId,
       req.body,
       { new: true, runValidators: true },
     );
@@ -87,9 +88,10 @@ export const updateUserProfile = async (req: Request, res: Response) => {
 };
 
 export const updateUserAvatar = async (req: Request, res: Response) => {
+  const userId = (req as RequestWithUser).user;
   try {
     const updAvatar = await User.findByIdAndUpdate(
-      req.user._id,
+      userId,
       req.body,
       { new: true, runValidators: true },
     );
