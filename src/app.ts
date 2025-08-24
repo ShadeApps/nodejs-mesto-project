@@ -3,8 +3,9 @@ import mongoose from 'mongoose';
 import cookieParser from 'cookie-parser';
 import userRouter from './routes/users';
 import cardRouter from './routes/cards';
-import auth from './middlewares/auth';
-import './utils/types';
+import auth from './middlewares/auth';import errorHandler from './middlewares/errorHandler';
+import { requestLogger, errorLogger } from './middlewares/logger';
+import { validateSignIn, validateSignUp } from './middlewares/validators';
 import { login, createUser } from './controllers/users';
 import { errors } from 'celebrate';
 import AppError from './errors/appError';
@@ -16,8 +17,8 @@ app.use(express.json());
 
 app.use(cookieParser());
 
-app.post('/signup', createUser);
-app.post('/signin', login);
+app.post('/signup', validateSignUp, createUser);
+app.post('/signin', validateSignIn, login);
 
 app.use(auth);
 
