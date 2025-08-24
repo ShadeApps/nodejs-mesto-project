@@ -1,6 +1,7 @@
 import { NextFunction, Request, Response } from 'express';
-import Card from '../models/card';
 import { RequestWithUser } from '../utils/types';
+import Card from '../models/card';
+import AppError from '../errors/appError';
 
 export const createCard = async (req: Request, res: Response, next: NextFunction) => {
   const userId = (req as RequestWithUser).user._id;
@@ -35,23 +36,21 @@ export const deleteCard = async (req: Request, res: Response, next: NextFunction
   try {
     const card = await Card.findByIdAndDelete(req.params.cardId);
     if (!card) {
-      return res.status(404).json({
-        message: 'Карточка с указанным _id не найдена.',
-      });
+      return next(new AppError('Карточка с указанным _id не найдена', 404));
     }
-    return res.status(200).json(card);
-  } catch (error: any) {
-    if (error.name === 'SyntaxError') {
-      return res.status(400).json({
-        message: 'Передан некорректный _id карточки.',
-      });
+
+    if (card.owner.toString() !== (req as RequestWithUser).user._id) {
+      return next(new AppError('Нет прав для удаления этой карточки', 403));
     }
-    if (error.name === 'CastError') {
-      return res.status(400).json({
-        message: 'Карточка с указанным _id не найдена.',
-      });
+
+    await card.remove();
+
+    return res.status(200).send({ message: 'Карточка удалена' });
+  } catch (err: unknown) {
+    if (err instanceof Error && err.name === 'CastError') {
+      return next(new AppError('Передан некорректный _id карточки', 400));
     }
-    return res.status(500).json({ message: 'На сервере произошла ошибка' });
+    return next(err);
   }
 };
 
