@@ -13,13 +13,11 @@ export const createCard = async (req: Request, res: Response, next: NextFunction
       name, link, owner, likes,
     });
     return res.status(201).json(card);
-  } catch (error: any) {
-    if (error.name === 'ValidationError') {
-      return res.status(400).json({
-        message: 'Переданы некорректные данные при создании карточки.',
-      });
+  } catch (err: unknown) {
+    if (err instanceof Error && err.name === 'ValidationError') {
+      return next(new AppError('Переданы некорректные данные при создании карточки', 400));
     }
-    return res.status(500).json({ message: 'На сервере произошла ошибка' });
+    return next(err);
   }
 };
 
