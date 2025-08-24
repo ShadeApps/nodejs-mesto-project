@@ -7,12 +7,12 @@ export const createCard = async (req: Request, res: Response, next: NextFunction
   const userId = (req as RequestWithUser).user._id;
   try {
     const {
-      name, link, owner = userId, likes,
+      name, link, owner = userId,
     } = req.body;
     const card = await Card.create({
-      name, link, owner, likes,
+      name, link, owner,
     });
-    return res.status(201).json(card);
+    return res.status(201).send(card);
   } catch (err: unknown) {
     if (err instanceof Error && err.name === 'ValidationError') {
       return next(new AppError('Переданы некорректные данные при создании карточки', 400));
@@ -32,7 +32,7 @@ export const getAllCards = async (req: Request, res: Response, next: NextFunctio
 
 export const deleteCard = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const card = await Card.findByIdAndDelete(req.params.cardId);
+    const card = await Card.findById(req.params.cardId);
     if (!card) {
       return next(new AppError('Карточка с указанным _id не найдена', 404));
     }
@@ -61,23 +61,15 @@ export const addLike = async (req: Request, res: Response, next: NextFunction) =
       { new: true },
     );
     if (!card) {
-      return res.status(404).json({
-        message: 'Передан несуществующий _id карточки.',
-      });
+      return next(new AppError('Карточка с указанным _id не найдена', 404));
     }
-    return res.status(200).json(card);
-  } catch (error: any) {
-    if (error.name === 'SyntaxError') {
-      return res.status(400).json({
-        message: 'Переданы некорректные данные для постановки/снятия лайка или некорректный _id карточки.',
-      });
+
+    return res.status(200).send(card);
+  } catch (err: unknown) {
+    if (err instanceof Error && err.name === 'CastError') {
+      return next(new AppError('Переданы некорректные данные для постановки лайка или некорректный _id карточки', 400));
     }
-    if (error.name === 'CastError') {
-      return res.status(400).json({
-        message: 'Переданы некорректные данные для постановки/снятия лайка или некорректный _id карточки.',
-      });
-    }
-    return res.status(500).json({ message: 'На сервере произошла ошибка' });
+    return next(err);
   }
 };
 
@@ -90,22 +82,14 @@ export const deleteLike = async (req: Request, res: Response, next: NextFunction
       { new: true },
     );
     if (!card) {
-      return res.status(404).json({
-        message: 'Передан несуществующий _id карточки.',
-      });
+      return next(new AppError('Передан несуществующий _id карточки', 404));
     }
-    return res.status(200).json(card);
-  } catch (error: any) {
-    if (error.name === 'SyntaxError') {
-      return res.status(400).json({
-        message: 'Переданы некорректные данные для постановки/снятия лайка или некорректный _id карточки.',
-      });
+
+    return res.status(200).send(card);
+  } catch (err: unknown) {
+    if (err instanceof Error && err.name === 'CastError') {
+      return next(new AppError('Переданы некорректные данные для постановки лайка или некорректный _id карточки', 400));
     }
-    if (error.name === 'CastError') {
-      return res.status(400).json({
-        message: 'Переданы некорректные данные для постановки/снятия лайка или некорректный _id карточки.',
-      });
-    }
-    return res.status(500).json({ message: 'На сервере произошла ошибка' });
+    return next(err);
   }
 };
