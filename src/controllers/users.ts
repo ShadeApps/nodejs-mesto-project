@@ -82,18 +82,15 @@ export const updateUserProfile = async (req: Request, res: Response, next: NextF
       { new: true, runValidators: true },
     );
     if (!updUser) {
-      return res.status(404).json({
-        message: 'Пользователь с указанным _id не найден.',
-      });
+      return next(new AppError('Пользователь по указанному _id не найден', 404));
     }
-    return res.status(200).json(updUser);
-  } catch (error: any) {
-    if (error.name === 'ValidationError' || error.name === 'CastError') {
-      return res.status(400).json({
-        message: 'Переданы некорректные данные при обновлении профиля.',
-      });
+
+    return res.status(200).send(updUser);
+  } catch (err: unknown) {
+    if (err instanceof Error && (err.name === 'ValidationError' || err.name === 'CastError')) {
+      return next(new AppError('Переданы некорректные данные при обновлении профиля', 400));
     }
-    return res.status(500).json({ message: 'На сервере произошла ошибка' });
+    return next(err);
   }
 };
 
@@ -106,18 +103,15 @@ export const updateUserAvatar = async (req: Request, res: Response, next: NextFu
       { new: true, runValidators: true },
     );
     if (!updAvatar) {
-      return res.status(404).json({
-        message: 'Пользователь с указанным _id не найден.',
-      });
+      return next(new AppError('Пользователь по указанному _id не найден', 404));
     }
-    return res.status(200).json(updAvatar);
-  } catch (error: any) {
-    if (error.name === 'ValidationError' || error.name === 'CastError') {
-      return res.status(400).json({
-        message: 'Переданы некорректные данные при обновлении аватара.',
-      });
+
+    return res.status(200).send(updAvatar);
+  } catch (err: unknown) {
+    if (err instanceof Error && (err.name === 'ValidationError' || err.name === 'CastError')) {
+      return next(new AppError('Переданы некорректные данные при обновлении аватара', 400));
     }
-    return res.status(500).json({ message: 'На сервере произошла ошибка' });
+    return next(err);
   }
 };
 
@@ -128,7 +122,7 @@ export const login = async (req: Request, res: Response, next: NextFunction) => 
     const user = await User.findOne({ email }).select('+password');
 
     if (!user || (!await bcrypt.compare(password, user.password))) {
-      return res.status(401).json({ message: 'Неправильные почта или пароль' });
+      return next(new AppError('Неправильные почта или пароль', 401));
     }
 
     const token = jwt.sign(
