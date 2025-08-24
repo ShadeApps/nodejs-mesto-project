@@ -6,6 +6,8 @@ import cardRouter from './routes/cards';
 import auth from './middlewares/auth';
 import './utils/types';
 import { login, createUser } from './controllers/users';
+import { errors } from 'celebrate';
+import AppError from './errors/appError';
 
 const { PORT = 3000 } = process.env;
 const app = express();
@@ -21,13 +23,12 @@ app.use(auth);
 
 app.use('/', userRouter);
 app.use('/', cardRouter);
-app.use('*', (req: Request, res: Response) => {
-  res.status(404).send({ message: 'Тут ничего нет.' });
+app.use('*', (req: Request, res: Response, next: NextFunction) => {
+  next(new AppError('Тут ничего нет.', 404));
 });
 
-mongoose.connect('mongodb://localhost:27017/mestodb')
-  .then(() => {
-    console.log('Успешное подключение к MongoDB.');
-    app.listen(PORT, () => console.log(`Сервер работает. Port: ${PORT}`));
-  })
-  .catch((err) => console.error('Ошибка подключения к MongoDB:', err));
+app.use(errors());
+
+mongoose.connect('mongodb://localhost:27017/mestodb');
+
+app.listen(+PORT);
