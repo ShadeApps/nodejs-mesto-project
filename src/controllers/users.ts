@@ -37,9 +37,9 @@ export const createUser = async (req: Request, res: Response, next: NextFunction
 export const getAllUsers = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const users = await User.find();
-    return res.status(200).json(users);
-  } catch (error: any) {
-    return res.status(500).json({ message: 'На сервере произошла ошибка' });
+    res.status(200).send(users);
+  } catch (err) {
+    next(err);
   }
 };
 
@@ -47,18 +47,15 @@ export const getUserById = async (req: Request, res: Response, next: NextFunctio
   try {
     const user = await User.findById(req.params.userId);
     if (!user) {
-      return res.status(404).json({
-        message: 'Пользователь по указанному _id не найден.',
-      });
+      return next(new AppError('Пользователь по указанному _id не найден', 404));
     }
-    return res.status(200).json(user);
-  } catch (error: any) {
-    if (error.name === 'ValidationError' || error.name === 'CastError') {
-      return res.status(400).json({
-        message: 'Передан некорректный _id пользователя.',
-      });
+
+    return res.status(200).send(user);
+  } catch (err: unknown) {
+    if (err instanceof Error && err.name === 'CastError') {
+      return next(new AppError('Передан некорректный _id пользователя', 400));
     }
-    return res.status(500).json({ message: 'На сервере произошла ошибка' });
+    return next(err);
   }
 };
 
@@ -67,13 +64,12 @@ export const getCurrentUser = async (req: Request, res: Response, next: NextFunc
   try {
     const user = await User.findById(userId);
     if (!user) {
-      return res.status(404).json({
-        message: 'Пользователь не найден.',
-      });
+      return next(new AppError('Пользователь по указанному _id не найден', 404));
     }
-    return res.status(200).json(user);
-  } catch (error: any) {
-    return res.status(500).json({ message: 'На сервере произошла ошибка' });
+
+    return res.status(200).send(user);
+  } catch (err) {
+    return next(err);
   }
 };
 
