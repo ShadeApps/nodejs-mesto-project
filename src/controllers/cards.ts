@@ -7,10 +7,10 @@ export const createCard = async (req: Request, res: Response, next: NextFunction
   const userId = (req as RequestWithUser).user._id;
   try {
     const {
-      name, link, owner = userId, likes, createdAt,
+      name, link, owner = userId, likes,
     } = req.body;
     const card = await Card.create({
-      name, link, owner, likes, createdAt,
+      name, link, owner, likes,
     });
     return res.status(201).json(card);
   } catch (error: any) {
@@ -26,9 +26,9 @@ export const createCard = async (req: Request, res: Response, next: NextFunction
 export const getAllCards = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const cards = await Card.find();
-    return res.status(200).json(cards);
-  } catch (error: any) {
-    return res.status(500).json({ message: 'На сервере произошла ошибка' });
+    return res.status(200).send(cards);
+  } catch (err) {
+    return next(err);
   }
 };
 
